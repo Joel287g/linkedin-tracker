@@ -1,0 +1,25 @@
+# Dependency directories
+node_modules/
+dist/
+
+# Playwright / LinkedIn Session (¡MUY IMPORTANTE!)
+.linkedin_session/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Environment variables
+.env
+.env.development
+.env.qa
+.env.production
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# OS Metadata
+.DS_Store
+Thumbs.db
