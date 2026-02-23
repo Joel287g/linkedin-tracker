@@ -11,16 +11,25 @@ export class ScraperListPageService {
   private readonly logger = new Logger(this.constructor.name);
   
   //? Configuración de URLs y Selectores
-  private readonly BASE_URL = "https://www.linkedin.com/my-items/saved-jobs/";
+  private readonly BASE_URL = "https://www.linkedin.com/jobs-tracker?stage=applied";
   
   private readonly SELECTORS = {
-    resultContainer: '[data-view-name="search-entity-result-universal-template"]',
-    listItems: "ul.list-style-none > li, .YvsNMObYucYBAKiwsymTZMosLkqPOJmSccg > li",
-    titleAnchor: ".entity-result__title a, a[data-test-app-aware-link]",
-    titleSpan: ".t-roman.t-sans span span",
-    company: ".entity-result__primary-subtitle, .TAsbpIWNZOQRGHLEWpuyrlheaGjwTzGcVkwg",
-    urnAttribute: "data-chameleon-result-urn"
-  };
+    //? Contenedor principal de cada tarjeta de empleo en la lista
+    resultContainer: 'div[data-view-name="opportunity-tracker-job-list"], .scaffold-layout__list',
+    
+    //? Los items ahora son divs dentro del contenedor principal
+    listItems: 'div[data-view-name="opportunity-tracker-job-card"]',
+    
+    //? Selector específico para el título basado en tu querySelector
+    titleAnchor: 'a[data-test-app-aware-link]',
+    titleSpan: 'p.ff44be0a', //? El párrafo que contiene el nombre del empleo
+    
+    //? Selector para la empresa (el subtítulo primario)
+    company: 'p.c2dd7318', 
+    
+    //? Atributo para identificar la oferta única
+    urnAttribute: 'data-job-id' 
+};
 
   /**
    ** Navega y extrae la lista básica de empleos guardados.
@@ -28,11 +37,13 @@ export class ScraperListPageService {
    * @param start Punto de inicio para la paginación (de 10 en 10)
    */
   async scrapeListPage(page: Page, start: number): Promise<JobBasicInfo[]> {
-    const url = `${this.BASE_URL}?start=${start}`;
+    const url = `${this.BASE_URL}`;
     
     //? Intento de navegación a la página de listado
     try {
       await page.goto(url, { waitUntil: "commit" });
+
+      this.logger.log(`Navegando a la página de empleos guardados: ${url}`);
 
       //* Espera a que los contenedores de las tarjetas de empleo sean visibles
       await page.waitForSelector(this.SELECTORS.resultContainer, {

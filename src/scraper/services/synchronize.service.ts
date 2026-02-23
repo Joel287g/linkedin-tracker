@@ -68,7 +68,7 @@ export class ScraperSynchronizeService {
       const allExtractedApplications: JobApplication[] = [];
 
       while (hasMoreData) {
-        this.logger.log(`//? Consultando LinkedIn start=${currentPointer}`);
+        this.logger.log(`Consultando LinkedIn start=${currentPointer}`);
 
         const pageItems = await this.listPageService.scrapeListPage(
           page,
@@ -93,11 +93,11 @@ export class ScraperSynchronizeService {
         }
 
         for (const item of newItems) {
-          // if (allExtractedApplications.length >= limit) {
-          //   this.logger.warn(`✅ Límite de ${limit} documentos alcanzado.`);
-          //   hasMoreData = false;
-          //   break;
-          // }
+          if (allExtractedApplications.length >= limit) {
+            this.logger.warn(`✅ Límite de ${limit} documentos alcanzado.`);
+            hasMoreData = false;
+            break;
+          }
 
           try {
             const fullDetail =
