@@ -8,8 +8,8 @@ export class ScraperController {
   @Get("sync")
   async sync(@Query("page") page?: string, @Query("limit") limit?: string) {
     return await this.scraperService.runSync({
-      startPage: page ? parseInt(page) : 1,
-      limit: limit ? parseInt(limit) : 10,
+      startPage: page ? parseInt(page) : undefined,
+      limit: limit ? parseInt(limit) : undefined,
     });
   }
 }

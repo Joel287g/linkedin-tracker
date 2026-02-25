@@ -9,6 +9,7 @@ export interface JobApplication {
   requirements: string[];
   applicationHistory: ApplicationStatusHistory[];
   recruiter: Recruiter | null;
+  status: string
   scrapedAt: string;
 }
 
@@ -30,6 +31,8 @@ export interface JobBasicInfo {
   jobId: string;
   title: string;
   company: string;
+  location: string;
+  workMode: string;
   link: string;
 }
 

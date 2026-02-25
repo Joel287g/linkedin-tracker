@@ -1,6 +1,11 @@
 //? Imports de NestJS y herramientas de scraping
 import { Injectable, Logger } from "@nestjs/common";
 import { Page } from "playwright";
+import {
+  ApplicationStatusHistory,
+  JobApplication,
+  JobBasicInfo,
+} from "src/applications/domain/interfaces/job-application.interface";
 
 @Injectable()
 export class ScraperJobDetailsService {
@@ -8,137 +13,175 @@ export class ScraperJobDetailsService {
 
   //? Selectores actualizados con el path verificado
   private readonly SELECTORS = {
+    //? Contenedor principal de la pagina
     workspace: "#workspace",
-    headerInfoContainer:
-      "div > div > div._4062c218.e2718449._4a745388 > div > div > div > div._27fa1ff5.f282d9dd.b41dfbd9._86b9d5f8.c88da257.f28ac035._28deab20",
-    locationPath:
-      "div > div > div._1ab93946 > div > div._27fa1ff5.f282d9dd.b41dfbd9._86b9d5f8.c88da257.f28ac035._8a44431b > p > span:nth-child(1)",
+
     description:
-      "div:nth-child(3) > div > div > div > div > div > div > p:nth-child(3)",
-    reqAnchor:
-      "p.ff44be0a._69367463.ca666375.bab11c20._65531f27.cfb2a716.b9b25d9c.a7de939b._8870eb30._7f740db4",
-    recruiterContainer:
-      "div:nth-child(2) > div > div > div > div > div > div > a",
+      "#workspace > div > div > div._1ba2e6ec.e70a0cce.f9a85e8c > div > div > div > div._23a2cc5c._118fa997._3b272d15._1f3c8209.a9262e33._01272bb7._80539d05 > div:nth-child(3) > div > div > div > div > div > div > p",
+
+    //? Selectores para la información del reclutador (si está disponible)
     recruiterName:
-      "div > div > div.f282d9dd._5afe57c9._86b9d5f8.e5367532.a032d3f6._28deab20 > div > p > a",
+      "#workspace > div > div > div._1ba2e6ec.e70a0cce.f9a85e8c > div > div > div > div._23a2cc5c._118fa997._3b272d15._1f3c8209.a9262e33._01272bb7._80539d05 > div:nth-child(2) > div > div > div > div > div > div > a > div > div > div._118fa997._2aed755f._1f3c8209.c52ca965._025b7248._33dcc58f > div > p > a",
     recruiterHeadline:
-      "div > div > div.bab11c20._65531f27.d07784b5.b9b25d9c.a7de939b._8870eb30._7f740db4 > p",
+      "#workspace > div > div > div._1ba2e6ec.e70a0cce.f9a85e8c > div > div > div > div._23a2cc5c._118fa997._3b272d15._1f3c8209.a9262e33._01272bb7._80539d05 > div:nth-child(2) > div > div > div > div > div > div > a > div > div > div.a02a0828._924e6326.e7df08c4.e766e6a3._68023ca4._0bdf4b7c._784eab0a > p",
+
+    //? Selectores para el historial de aplicaciones (si está disponible)
     statusListContainer:
-      "div._27fa1ff5.f282d9dd.b41dfbd9._86b9d5f8.c88da257.f28ac035._5971f7f9 ul",
-    statusTitle:
-      "p.ff44be0a.f6f4660e.bab11c20._65531f27.cfb2a716.b9b25d9c.a7de939b._8870eb30._7f740db4",
-    statusDate:
-      "p.ff44be0a.c2dd7318.bab11c20._65531f27.d07784b5.b9b25d9c.a7de939b._4d0262ae._7f740db4",
+      "#workspace > div > div > div._1ba2e6ec.e70a0cce.f9a85e8c > div > div > div > div._23a2cc5c._118fa997._3b272d15._1f3c8209.a9262e33._01272bb7._80539d05 > div._23a2cc5c._118fa997._3b272d15._1f3c8209.a9262e33._01272bb7._33dcc58f > div > div > div",
   };
 
-  async enrichWithJobDetails(page: Page, item: any) {
-    if (item.link === "Sin enlace") {
-      return {
-        ...item,
-        description: "",
-        requirements: [],
-        location: "N/A",
-        recruiter: null,
-      };
+  private readonly SELECTORS_IA = {
+    //? Contenedor principal de la pagina
+    workspace: "#workspace",
+
+    description:
+      "#workspace > div > div > div._1ba2e6ec.e70a0cce.f9a85e8c > div > div > div > div._23a2cc5c._118fa997._3b272d15._1f3c8209.a9262e33._01272bb7._80539d05 > div:nth-child(3) > div > div > div > div > div > div > p",
+
+    //? Selectores para la información del reclutador (si está disponible)
+    recruiterName:
+      "#workspace > div > div > div._1ba2e6ec.e70a0cce.f9a85e8c > div > div > div > div._23a2cc5c._118fa997._3b272d15._1f3c8209.a9262e33._01272bb7._80539d05 > div:nth-child(2) > div > div > div > div > div > div > a > div > div > div._118fa997._2aed755f._1f3c8209.c52ca965._025b7248._33dcc58f > div > p > a",
+    recruiterHeadline:
+      "#workspace > div > div > div._1ba2e6ec.e70a0cce.f9a85e8c > div > div > div > div._23a2cc5c._118fa997._3b272d15._1f3c8209.a9262e33._01272bb7._80539d05 > div:nth-child(2) > div > div > div > div > div > div > a > div > div > div.a02a0828._924e6326.e7df08c4.e766e6a3._68023ca4._0bdf4b7c._784eab0a > p",
+
+    //? Selectores para el historial de aplicaciones (si está disponible)
+    statusListContainer:
+      "#workspace > div > div > div._1ba2e6ec.e70a0cce.f9a85e8c > div > div > div > div._23a2cc5c._118fa997._3b272d15._1f3c8209.a9262e33._01272bb7._80539d05 > div._23a2cc5c._118fa997._3b272d15._1f3c8209.a9262e33._01272bb7._33dcc58f > div > div > div",
+  };
+
+  async enrichWithJobDetails(page: Page, item: JobBasicInfo) {
+    let SELECTORS = this.SELECTORS;
+
+    //* Preparación y navegación a la página de detalles del empleo
+    try {
+      //? Navegamos a la página de detalles del empleo
+      await page.goto(item.link, { waitUntil: "commit" });
+
+      //? Verificación de la URL para determinar si estamos en la vista IA o clásica
+      const isIA: boolean = page.url().includes("jobs-tracker");
+      SELECTORS = isIA ? this.SELECTORS_IA : this.SELECTORS;
+
+      this.logger.log(
+        `Navegado a ${isIA ? "vista IA" : "vista clásica"}: ${page.url()}`,
+      );
+
+      //? Espera a que los contenedores de las tarjetas de empleo sean visibles
+      await page.waitForSelector(SELECTORS.workspace, {
+        state: "visible",
+        timeout: 10000,
+      });
+
+      //? Scroll táctico para disparar el Lazy Loading de las imágenes y datos de la lista
+      await page.evaluate(() => window.scrollBy(0, window.innerHeight));
+      await page.waitForTimeout(1000);
+    } catch (error) {
+      this.logger.error(error.message);
+      return { ...item };
     }
 
+    //* Extracción de detalles adicionales desde la página de detalles del empleo
     try {
-      await page.goto(item.link, {
-        waitUntil: "domcontentloaded",
-        timeout: 30000,
-      });
-      await page.waitForTimeout(3500);
-
-      const details = await page.evaluate((selectors) => {
-        //? Helper unificado para buscar dentro del workspace
-        const root = document.querySelector(selectors.workspace);
-        if (!root) return null;
-
-        //? Extracción de Ubicación usando el path verificado
-        const locationEl = root.querySelector(
-          `${selectors.headerInfoContainer} > ${selectors.locationPath}`,
+      const details = await page.evaluate((selector) => {
+        //? Extracción de datos usando los selectores específicos
+        let descriptionEl = document.querySelector(
+          selector.description,
         ) as HTMLElement;
 
-        //? Extracción de Descripción (ajustada a la jerarquía común)
-        const descContainer = root.querySelector(
-          "div > div > div._4062c218.e2718449._4a745388 > div > div > div > div._27fa1ff5.f282d9dd.b41dfbd9._86b9d5f8.c88da257.f28ac035._5971f7f9",
-        );
-        const description = descContainer?.querySelector(
-          selectors.description,
+        const recruiterNameEl = document.querySelector(
+          selector.recruiterName,
         ) as HTMLElement;
 
-        const requirements = document.querySelector(selectors.reqAnchor);
-        const recruiterAnchor = descContainer?.querySelector(
-          selectors.recruiterContainer,
-        );
-
-        //? 1. Obtener la lista de estados
-        const statusElements = document.querySelectorAll(
-          `${selectors.statusListContainer} li`,
-        );
-        const applicationHistory = Array.from(statusElements)
-          .map((li) => {
-            const title = li
-              .querySelector(selectors.statusTitle)
-              ?.textContent?.trim();
-            let date = li
-              .querySelector(selectors.statusDate)
-              ?.textContent?.trim();
-
-            return {
-              statusTitle: title || "Desconocido",
-              statusDate: date || "N/A",
-            };
-          })
-          .filter((h) => h.statusTitle !== "Desconocido");
-
-        const nameEl = recruiterAnchor?.querySelector(
-          selectors.recruiterName,
-        ) as HTMLAnchorElement;
-        const headEl = recruiterAnchor?.querySelector(
-          selectors.recruiterHeadline,
+        const recruiterHeadlineEl = document.querySelector(
+          selector.recruiterHeadline,
         ) as HTMLElement;
 
-        const requirementsArray: string[] = [];
-        if (requirements) {
-          let nextEl = requirements.nextElementSibling;
-          while (nextEl && nextEl.tagName === "P") {
-            const text = nextEl.textContent?.trim();
-            if (text) requirementsArray.push(text.replace(/^•\s*/, ""));
-            nextEl = nextEl.nextElementSibling;
+        const requirementsEl = Array.from(document.querySelectorAll("p")).find(
+          (p) =>
+            p.innerText
+              .trim()
+              .toLowerCase()
+              .includes("requisitos añadidos por el anunciante del empleo"),
+        ) as HTMLElement;
+
+        const statusListContainer = document.querySelector(
+          selector.statusListContainer,
+        ) as HTMLElement;
+
+        const listItems = Array.from(
+          statusListContainer.querySelectorAll("li"),
+        ) as HTMLElement[];
+
+        //? Procesamiento de los datos para obtener la información estructurada
+        const description = descriptionEl
+          ? descriptionEl.innerText.trim()
+          : "Descripción no disponible";
+
+        const recruiterName = recruiterNameEl
+          ? recruiterNameEl.innerText.trim()
+          : "Reclutador no disponible";
+
+        const recruiterHeadline = recruiterHeadlineEl
+          ? recruiterHeadlineEl.innerText.trim()
+          : "Cargo no disponible";
+
+        const recruiterProfileLink = recruiterNameEl
+          ? recruiterNameEl.getAttribute("href")
+          : "Enlace no disponible";
+
+        const requirements: string[] = [];
+
+        if (requirementsEl && requirementsEl !== null) {
+          let requirement = requirementsEl.nextElementSibling;
+          while (
+            requirement &&
+            requirement.tagName === "P" &&
+            requirement.textContent?.trim().startsWith("•")
+          ) {
+            requirements.push(requirement.textContent.slice(1).trim());
+            requirement = requirement.nextElementSibling;
           }
         }
 
+        const recruiter = {
+          name: recruiterName,
+          headline: recruiterHeadline,
+          profileLink: recruiterProfileLink,
+        };
+
+        const applicationHistory = new Array<ApplicationStatusHistory>();
+
+        listItems.forEach((item) => {
+          const paragraphs = item.querySelectorAll("p");
+
+          const statusTitle =
+            paragraphs[0]?.innerText.trim() || "Estado desconocido";
+          const statusDate =
+            paragraphs[1]?.innerText.trim() || "Fecha desconocida";
+
+          applicationHistory.push({
+            statusTitle,
+            statusDate,
+          });
+        });
+
+        const status =
+          applicationHistory.length > 0
+            ? applicationHistory[0].statusTitle
+            : "Sincronizado";
+
         return {
-          location:
-            locationEl?.innerText?.trim() || "Ubicación no especificada",
-          description:
-            description?.innerText?.trim() || "Sin descripción disponible",
-          requirements: requirementsArray,
-          recruiter: recruiterAnchor
-            ? {
-                name: nameEl?.innerText?.trim() || "No visible",
-                profileLink: nameEl?.href?.split("?")[0] || "N/A",
-                headline: headEl?.innerText?.trim() || "Sin cargo",
-              }
-            : null,
+          description,
+          requirements,
+          recruiter,
           applicationHistory,
+          status,
+          scrapedAt: new Date().toISOString(),
         };
       }, this.SELECTORS);
 
-      this.logger.log(
-        `✅ Detalle extraído: ${item.title} | Loc: ${details?.location}`,
-      );
-      return { ...item, ...details, scrapedAt: new Date().toISOString() };
+      return { ...item, ...details };
     } catch (error) {
-      this.logger.error(`❌ Error en item ${item.jobId}: ${error.message}`);
-      return {
-        ...item,
-        description: "Error",
-        requirements: [],
-        location: "Error",
-        recruiter: null,
-      };
+      this.logger.error(error);
+      return { ...item };
     }
   }
 }

@@ -33,6 +33,7 @@ export class ScraperPersistenceService {
     requirements,
     applicationHistory,
     recruiter,
+    status,
   }: JobApplication): Promise<void> {
     try {
       await this.applicationModel.create({
@@ -49,6 +50,7 @@ export class ScraperPersistenceService {
           profileLink: recruiter?.profileLink,
           headline: recruiter?.headline,
         },
+        status,
         scrapedAt: new Date(),
       });
     } catch (error) {

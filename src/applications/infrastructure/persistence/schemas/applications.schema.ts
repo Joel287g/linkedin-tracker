@@ -76,8 +76,6 @@ export class Application extends Document {
 
   @Prop({
     required: true,
-    default: "Sincronizado",
-    enum: ["Sincronizado", "Pendiente", "Descartado", "Aplicado"],
     index: true,
   })
   status: string;
