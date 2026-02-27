@@ -1,22 +1,15 @@
-//? Imports de NestJS y Mongoose
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+//? Imports de codigo
 import { Document } from "mongoose";
-import { ApplicationStatusHistory } from "src/applications/domain/interfaces/job-application.interface";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-//* Definición de sub-esquema para el reclutador (Mejora la legibilidad)
-@Schema({ _id: false })
-class Recruiter {
-  @Prop({ trim: true })
-  name: string;
+//? Imports de usuario
+import {
+  ApplicationStatusHistory,
+  ApplicationStatusHistorySchema,
+} from "./applications-status.schema";
+import { Recruiter, RecruiterSchema } from "./applications-recruiter.schema";
+import { urlLinkedInValidator } from "./validators/common.validator";
 
-  @Prop({ trim: true })
-  profileLink: string;
-
-  @Prop({ trim: true })
-  headline: string;
-}
-
-//? Limpieza de la respuesta JSON para la API
 @Schema({
   _id: true,
   versionKey: false,
@@ -28,65 +21,62 @@ class Recruiter {
   },
 })
 export class Application extends Document {
-  //* Identificador único de LinkedIn para evitar duplicados
-  @Prop({ unique: true, required: true, index: true })
+  @Prop({ required: true, type: String, unique: true, index: true })
   jobId: string;
 
-  @Prop({ required: true, trim: true })
+  @Prop({ required: true, type: String, trim: true })
   title: string;
 
-  @Prop({ required: true, trim: true, index: true })
+  @Prop({ required: true, type: String, trim: true, index: true })
   company: string;
 
-  @Prop({ required: true, trim: true })
+  @Prop({ required: true, type: String, trim: true })
   location: string;
 
   @Prop({
     required: true,
-    unique: true,
+    type: String,
     trim: true,
-    validate: {
-      validator: (v: string) => v.startsWith("http"),
-      message: "El link debe ser una URL válida",
-    },
+    unique: true,
+    validate: urlLinkedInValidator,
   })
   link: string;
 
   @Prop({
     required: true,
+    type: String,
     trim: true,
     maxlength: 15000,
   })
   description: string;
 
-  //* Array de requisitos extraídos (Clean Code)
   @Prop({ required: true, type: [String], default: [] })
   requirements: string[];
 
-  //* Historial de estados de la aplicación (Clean Code)
   @Prop({
     required: true,
+    type: [ApplicationStatusHistorySchema],
     default: [],
   })
   applicationStatusHistory: ApplicationStatusHistory[];
 
-  //* Objeto anidado del reclutador usando el sub-esquema
-  @Prop({ required: true, type: Recruiter, default: null })
+  @Prop({ required: true, type: RecruiterSchema, default: {} })
   recruiter: Recruiter;
 
   @Prop({
     required: true,
+    type: String,
     index: true,
   })
   status: string;
 
-  @Prop({ required: true, default: Date.now })
+  @Prop({ required: true, type: Date, default: Date.now })
   scrapedAt: Date;
 
-  @Prop({ required: true, default: Date.now })
+  @Prop({ required: true, type: Date, default: Date.now })
   createdAt: Date;
 
-  @Prop({ required: true, default: Date.now })
+  @Prop({ required: true, type: Date, default: Date.now })
   updatedAt: Date;
 }
 
