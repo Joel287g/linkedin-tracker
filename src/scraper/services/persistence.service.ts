@@ -33,7 +33,7 @@ export class ScraperPersistenceService {
           applicationStatusHistory: payload.applicationHistory,
           scrapedAt: new Date(),
         },
-        { upsert: true, new: true, runValidators: true },
+        { upsert: true, returnDocument: "after", runValidators: true },
       );
 
       this.logger.log(`✅ JobId ${payload.jobId} procesado correctamente`);

@@ -106,9 +106,11 @@ export class ScraperJobDetailsService {
           selector.statusListContainer,
         ) as HTMLElement;
 
-        const listItems = Array.from(
-          statusListContainer.querySelectorAll("li"),
-        ) as HTMLElement[];
+        const listItems = statusListContainer
+          ? (Array.from(
+              statusListContainer.querySelectorAll("li"),
+            ) as HTMLElement[])
+          : ([] as HTMLElement[]);
 
         //? Procesamiento de los datos para obtener la información estructurada
         const description = descriptionEl

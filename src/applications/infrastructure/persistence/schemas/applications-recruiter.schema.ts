@@ -6,18 +6,18 @@ import { urlLinkedInValidator } from "./validators/common.validator";
 
 @Schema({ _id: false, versionKey: false, timestamps: false })
 export class Recruiter {
-  @Prop({ required: true, type: String, trim: true })
+  @Prop({ required: false, type: String, trim: true })
   name: string;
 
   @Prop({
-    required: true,
+    required: false,
     type: String,
     trim: true,
     validate: urlLinkedInValidator,
   })
   profileLink: string;
 
-  @Prop({ required: true, type: String, trim: true })
+  @Prop({ required: false, type: String, trim: true })
   headline: string;
 }
 
