@@ -8,8 +8,10 @@ import { ScraperListPageService } from "./list-page.service";
 import { ScraperJobDetailsService } from "./job-details.service";
 import { ScraperPersistenceService } from "./persistence.service";
 
-import { JobApplication } from "../../applications/domain/interfaces/job-application.interface";
-import { SyncOptions } from "../../applications/domain/interfaces/sync-options.interface";
+import {
+  JobApplication,
+  SyncOptions,
+} from "../../applications/domain/interfaces";
 
 @Injectable()
 export class ScraperSynchronizeService {

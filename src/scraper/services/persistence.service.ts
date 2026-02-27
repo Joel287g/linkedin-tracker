@@ -1,11 +1,12 @@
 //? Imports de NestJS y Mongoose
-import { Injectable, Logger } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
+import { Injectable, Logger } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+
 //? Interfaces y Esquemas
-import { JobApplication } from "src/applications/domain/interfaces/job-application.interface";
-import { Application } from "src/applications/infrastructure/persistence/schemas/applications.schema";
+import { JobApplication } from "src/applications/domain/interfaces";
+import { Application } from "src/applications/infrastructure/persistence/schemas";
 
 @Injectable()
 export class ScraperPersistenceService {

@@ -1,10 +1,11 @@
 //? Imports de NestJS y herramientas de scraping
-import { Injectable, Logger } from "@nestjs/common";
 import { Page } from "playwright";
 
+import { Injectable, Logger } from "@nestjs/common";
+
 //? Imports de usuario
-import { JobBasicInfo } from "src/applications/domain/interfaces/job-application.interface";
-import { ApplicationStatusHistory } from "src/applications/infrastructure/persistence/schemas/applications-status.schema";
+import { JobBasicInfo } from "src/applications/domain/interfaces";
+import { ApplicationStatusHistory } from "src/applications/infrastructure/persistence/schemas";
 
 @Injectable()
 export class ScraperJobDetailsService {

@@ -1,5 +1,8 @@
+//? Imports de codigo
 import { Controller, Get, Query } from "@nestjs/common";
-import { ScraperSynchronizeService } from "./services/synchronize.service";
+
+//? Imports de usuario
+import { ScraperSynchronizeService } from "./services";
 
 @Controller("scraper")
 export class ScraperController {

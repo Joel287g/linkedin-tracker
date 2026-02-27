@@ -3,10 +3,12 @@ import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 
 //? Imports de Servicios (Lógica de Negocio)
-import { ScraperSynchronizeService } from "./services/synchronize.service";
-import { ScraperListPageService } from "./services/list-page.service";
-import { ScraperJobDetailsService } from "./services/job-details.service";
-import { ScraperPersistenceService } from "./services/persistence.service";
+import {
+  ScraperSynchronizeService,
+  ScraperJobDetailsService,
+  ScraperListPageService,
+  ScraperPersistenceService,
+} from "./services";
 
 //? Imports de Controladores
 import { ScraperController } from "./scraper.controller";
@@ -15,7 +17,7 @@ import { ScraperController } from "./scraper.controller";
 import {
   Application,
   ApplicationSchema,
-} from "../applications/infrastructure/persistence/schemas/applications.schema";
+} from "../applications/infrastructure/persistence/schemas";
 
 @Module({
   imports: [
