@@ -24,38 +24,23 @@ export class ScraperPersistenceService {
    * @returns Promise<void>
    *
    */
-  async createJobApplication({
-    jobId,
-    title,
-    company,
-    location,
-    link,
-    description,
-    requirements,
-    applicationHistory,
-    recruiter,
-    status,
-  }: JobApplication): Promise<void> {
+  async createJobApplication(payload: JobApplication): Promise<void> {
     try {
-      await this.applicationModel.create({
-        jobId,
-        title,
-        company,
-        location,
-        link,
-        description,
-        requirements,
-        applicationStatusHistory: applicationHistory,
-        recruiter: {
-          name: recruiter?.name,
-          profileLink: recruiter?.profileLink,
-          headline: recruiter?.headline,
+      await this.applicationModel.findOneAndUpdate(
+        { jobId: payload.jobId },
+        {
+          ...payload,
+          applicationStatusHistory: payload.applicationHistory,
+          scrapedAt: new Date(),
         },
-        status,
-        scrapedAt: new Date(),
-      });
+        { upsert: true, new: true, runValidators: true },
+      );
+
+      this.logger.log(`✅ JobId ${payload.jobId} procesado correctamente`);
     } catch (error) {
-      this.logger.error(`❌ Error al crear jobId ${jobId}: ${error.message}`);
+      this.logger.error(
+        `❌ Error al procesar jobId ${payload.jobId}: ${error.message}`,
+      );
     }
   }
 
@@ -66,10 +51,7 @@ export class ScraperPersistenceService {
    */
   async getAllJobIds(): Promise<string[]> {
     try {
-      const applications = await this.applicationModel
-        .find({}, { jobId: 1, _id: 0 })
-        .lean();
-      return applications.map((app) => app.jobId);
+      return await this.applicationModel.distinct("jobId").lean();
     } catch (error) {
       this.logger.error(`❌ Error al obtener jobIds: ${error.message}`);
       return [];
