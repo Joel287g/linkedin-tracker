@@ -1,5 +1,5 @@
 //? Imports de NestJS y Mongoose
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
@@ -24,22 +24,58 @@ export class ScraperPersistenceService {
    * @returns Promise<void>
    *
    */
-  async createJobApplication(payload: JobApplication): Promise<void> {
+  async createJobApplication({
+    jobId,
+    title,
+    company,
+    location,
+    workMode,
+    link,
+    description,
+    requirements,
+    applicationHistory,
+    recruiter,
+    status,
+  }: JobApplication): Promise<void> {
     try {
-      await this.applicationModel.findOneAndUpdate(
-        { jobId: payload.jobId },
-        {
-          ...payload,
-          applicationStatusHistory: payload.applicationHistory,
-          scrapedAt: new Date(),
-        },
-        { upsert: true, returnDocument: "after", runValidators: true },
-      );
+      const application = await this.applicationModel.findOne({ jobId });
 
-      this.logger.log(`✅ JobId ${payload.jobId} procesado correctamente`);
+      if (application) {
+        this.logger.log(`🔄 Actualizando aplicación con jobId ${jobId}`);
+
+        application.description = description;
+        application.requirements = requirements;
+        application.applicationStatusHistory = applicationHistory;
+        application.recruiter = recruiter;
+        application.status = status;
+        application.scrapedAt = new Date();
+        application.updatedAt = new Date();
+
+        await application.save();
+        return;
+      } else {
+        this.logger.log(`➕ Creando nueva aplicación con jobId ${jobId}`);
+
+        await this.applicationModel.create({
+          jobId,
+          title,
+          company,
+          location,
+          workMode,
+          link,
+          description,
+          requirements,
+          applicationStatusHistory: applicationHistory,
+          recruiter,
+          status,
+          scrapedAt: new Date(),
+        });
+      }
+
+      this.logger.log(`✅ JobId ${jobId} procesado correctamente`);
     } catch (error) {
       this.logger.error(
-        `❌ Error al procesar jobId ${payload.jobId}: ${error.message}`,
+        `❌ Error al procesar jobId ${jobId}: ${error.message}`,
       );
     }
   }

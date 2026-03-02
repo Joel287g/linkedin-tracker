@@ -33,6 +33,9 @@ export class Application extends Document {
   @Prop({ required: true, type: String, trim: true })
   location: string;
 
+  @Prop({ required: true, type: String, trim: true })
+  workMode: string;
+
   @Prop({
     required: true,
     type: String,

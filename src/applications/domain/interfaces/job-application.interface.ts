@@ -10,6 +10,7 @@ import { Recruiter } from "./recruiter.interface";
  * @property title - Título del empleo
  * @property company - Nombre de la empresa
  * @property location - Ubicación del empleo
+ * @property workMode - Modalidad de trabajo (presencial, remoto, híbrido)
  * @property link - URL directa a la página del empleo en LinkedIn
  * @property description - Descripción detallada del empleo
  * @property requirements - Lista de requisitos o habilidades necesarias para el empleo
@@ -27,11 +28,12 @@ export interface JobApplication {
   title: string;
   company: string;
   location: string;
+  workMode: string;
   link: string;
   description: string;
   requirements: string[];
   applicationHistory: ApplicationStatusHistory[];
-  recruiter: Recruiter | null;
+  recruiter: Recruiter;
   status: string;
   scrapedAt: string;
 }

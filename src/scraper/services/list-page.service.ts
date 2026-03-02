@@ -31,38 +31,25 @@ export class ScraperListPageService {
     titleSpan: ".t-roman.t-sans span span",
 
     //? Selector para la empresa (el subtítulo primario)
-    //document.querySelector("")
     company:
-      "body > div.application-outlet > div.authentication-outlet > div > main > section > div > div > div > ul > li > div > div > div > div.qSUjkRSKWRifsnRGzuNCrFVVExnLrkcM.SSGAkMtVUTWiucLzBYRvBFcTXJGgiDvYM.pt3.pb3.t-12.t-black--light > div.mb1 > div.yCnUSBgeheryesBfyITTAwskKIazHCbjusk.t-14.t-black.t-normal",
-
-    //? Selector para la ubicación (a veces está en el mismo campo que la empresa)
-    location:
-      "body > div.application-outlet > div.authentication-outlet > div > main > section > div > div > div > ul > li > div > div > div > div.qSUjkRSKWRifsnRGzuNCrFVVExnLrkcM.SSGAkMtVUTWiucLzBYRvBFcTXJGgiDvYM.pt3.pb3.t-12.t-black--light > div.mb1 > div.YwabAxRlipFmdhzjIYQGgyoNZIvBVSDwiAVo.t-14.t-normal",
+      ".job-details-jobs-unified-top-card__company-name, .t-14.t-black.t-normal",
   };
 
   private readonly SELECTORS_IA = {
     //? Contenedor principal de cada tarjeta de empleo en la lista
-    resultContainer:
-      "#workspace > div > div > div > div > div._3b61fc0d > div > div > div._72a29cf0.c9b59583._610791f8.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717.b44974d0._94a82bb0._239ac6f5._2eeaf4c3 > div > div._72a29cf0.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717._94a82bb0._548a48e2.d29dec2a._11a9bff5.ec4b97a4 > div._72a29cf0.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717",
+    resultContainer: "null",
 
     //? Los items ahora son divs dentro del contenedor principal
-    listItems:
-      "#workspace > div > div > div > div > div._3b61fc0d > div > div > div._72a29cf0.c9b59583._610791f8.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717.b44974d0._94a82bb0._239ac6f5._2eeaf4c3 > div > div._72a29cf0.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717._94a82bb0._548a48e2.d29dec2a._11a9bff5.ec4b97a4 > div._72a29cf0.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717 > div",
+    listItems: "null",
 
     //? Selector específico para el título basado en tu querySelector
-    titleAnchor:
-      "#workspace > div > div > div > div > div._3b61fc0d > div > div > div._72a29cf0.c9b59583._610791f8.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717.b44974d0._94a82bb0._239ac6f5._2eeaf4c3 > div > div._72a29cf0.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717._94a82bb0._548a48e2.d29dec2a._11a9bff5.ec4b97a4 > div._72a29cf0.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717 > div > div._34b4c8e3._1a39b08d.be6de7df._3639b718._585b7d31._12e91934.f99f1ae0.cbdb6717 > div > a",
+    titleAnchor: "null",
 
     //? El párrafo que contiene el nombre del empleo
-    titleSpan:
-      "#workspace > div > div > div > div > div._3b61fc0d > div > div > div._72a29cf0.c9b59583._610791f8.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717.b44974d0._94a82bb0._239ac6f5._2eeaf4c3 > div > div._72a29cf0.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717._94a82bb0._548a48e2.d29dec2a._11a9bff5.ec4b97a4 > div._72a29cf0.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717 > div > div._34b4c8e3._1a39b08d.be6de7df._3639b718._585b7d31._12e91934.f99f1ae0.cbdb6717 > div > a > div > div > p._38df260a._2ef9145d._52d76f7b._0bb93b49.fe9c0fa3._1843f717._7f44e616.fac80ba8._3607329d",
+    titleSpan: "null",
 
     //? Selector para la empresa (el subtítulo primario)
-    company:
-      "#workspace > div > div > div > div > div._3b61fc0d > div > div > div._72a29cf0.c9b59583._610791f8.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717.b44974d0._94a82bb0._239ac6f5._2eeaf4c3 > div > div._72a29cf0.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717._94a82bb0._548a48e2.d29dec2a._11a9bff5.ec4b97a4 > div._72a29cf0.be6de7df._64029ed9._585b7d31._1ee6e656.f99f1ae0.cbdb6717 > div > div._34b4c8e3._1a39b08d.be6de7df._3639b718._585b7d31._12e91934.f99f1ae0.cbdb6717 > div > a > div > div > p._38df260a._5af038a6._52d76f7b._0bb93b49._227636e9._1843f717._7f44e616.fac80ba8._3607329d",
-
-    //? Selector para la ubicación (a veces está en el mismo campo que la empresa)
-    location: "null",
+    company: "null",
   };
 
   /**
@@ -119,9 +106,7 @@ export class ScraperListPageService {
             const companyEl = item.querySelector(
               selector.company,
             ) as HTMLElement;
-            const locationEl = item.querySelector(
-              selector.location,
-            ) as HTMLElement;
+            const locationEl = companyEl.nextElementSibling as HTMLElement;
 
             //? Procesamiento de los datos para obtener la información estructurada
             const link = titleAnchor?.href?.split("?")[0] || "Sin enlace";
