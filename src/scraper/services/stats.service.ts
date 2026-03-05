@@ -54,4 +54,13 @@ export class ScraperStatsService {
       throw error;
     }
   }
+
+  async getGhosting() {
+    try {
+      return await this.persistenceService.getGhosting();
+    } catch (error) {
+      this.logger.error("Error al obtener estadísticas", error);
+      throw error;
+    }
+  }
 }

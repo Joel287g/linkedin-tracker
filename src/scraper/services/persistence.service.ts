@@ -77,6 +77,7 @@ export class ScraperPersistenceService {
       this.logger.error(
         `❌ Error al procesar jobId ${jobId}: ${error.message}`,
       );
+      throw error;
     }
   }
 
@@ -90,7 +91,7 @@ export class ScraperPersistenceService {
       return await this.applicationModel.distinct("jobId").lean();
     } catch (error) {
       this.logger.error(`❌ Error al obtener jobIds: ${error.message}`);
-      return [];
+      throw error;
     }
   }
 
@@ -149,7 +150,145 @@ export class ScraperPersistenceService {
       this.logger.error(
         `❌ Error al generar gráfico de evolución: ${error.message}`,
       );
-      return;
+      throw error;
+    }
+  }
+
+  /**
+   * **
+   *
+   */
+  async getGhosting() {
+    try {
+      return await this.applicationModel.aggregate([
+        {
+          $project: {
+            company: 1,
+            link: 1,
+            sentStatus: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: "$applicationStatusHistory",
+                    as: "status",
+                    cond: {
+                      $eq: ["$$status.statusTitle", "Solicitud enviada"],
+                    },
+                  },
+                },
+                0,
+              ],
+            },
+            viewedStatus: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: "$applicationStatusHistory",
+                    as: "status",
+                    cond: {
+                      $eq: ["$$status.statusTitle", "Solicitud vista"],
+                    },
+                  },
+                },
+                0,
+              ],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$company",
+            company: {
+              $first: "$company",
+            },
+            totalJobs: {
+              $sum: 1,
+            },
+            sentStatuses: {
+              $push: "$sentStatus",
+            },
+            viewedStatuses: {
+              $push: "$viewedStatus",
+            },
+            applications: {
+              $push: {
+                link: "$link",
+                sent: "$sentStatus",
+                viewed: "$viewedStatus",
+                needsFollowUp: {
+                  $and: [
+                    {
+                      $eq: [
+                        {
+                          $ifNull: ["$viewedStatus", null],
+                        },
+                        null,
+                      ],
+                    },
+                    //? Filtro 1: Nadie la ha visto
+                    {
+                      $not: {
+                        $regexMatch: {
+                          input: "$sentStatus.statusDate",
+                          regex: /minutos|hora/,
+                        },
+                      },
+                    }, //? Filtro 2: No es una aplicación recién enviada
+                  ],
+                },
+              },
+            },
+            ghostingCount: {
+              $sum: {
+                $cond: [
+                  {
+                    $ifNull: ["$viewedStatus", false],
+                  },
+                  0,
+                  1,
+                ],
+              },
+            },
+          },
+        },
+        {
+          $unset: ["_id", "sentStatuses", "viewedStatuses"],
+        },
+        {
+          $addFields: {
+            ghostingRate: {
+              $concat: [
+                {
+                  $toString: {
+                    $round: [
+                      {
+                        $multiply: [
+                          {
+                            $divide: ["$ghostingCount", "$totalJobs"],
+                          },
+                          100,
+                        ],
+                      },
+                      0,
+                    ],
+                  },
+                },
+                "%",
+              ],
+            },
+          },
+        },
+        {
+          $sort: {
+            ghostingCount: -1,
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(
+        `❌ Error al generar gráfico de evolución: ${error.message}`,
+      );
+      throw error;
     }
   }
 }

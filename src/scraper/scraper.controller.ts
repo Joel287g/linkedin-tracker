@@ -23,4 +23,9 @@ export class ScraperController {
   async getStatus() {
     return await this.statsService.getStatus();
   }
+
+  @Get('ghosting')
+  async ghosting() {
+    return await this.statsService.getGhosting()
+  }
 }
