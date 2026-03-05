@@ -155,7 +155,9 @@ export class ScraperPersistenceService {
   }
 
   /**
-   * **
+   * ** Genera un gráfico de ghosting de las empresas
+   * @description Método auxiliar para visualizar la evolución del ghosting de las empresas eb las aplicaciones a lo largo del tiempo.
+   * @return Promise<Object[]>
    *
    */
   async getGhosting() {
@@ -281,6 +283,40 @@ export class ScraperPersistenceService {
         {
           $sort: {
             ghostingCount: -1,
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(
+        `❌ Error al generar gráfico de evolución: ${error.message}`,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * ** Genera un gráfico con todas las ubicaciones de las aplicaciones.
+   * @return Promise<Object[]>
+   *
+   */
+  async getHeatMap() {
+    try {
+      return await this.applicationModel.aggregate([
+        {
+          $group: {
+            _id: "$location",
+            location: { $first: "$location" },
+            count: { $sum: 1 },
+            links: { $push: "$link" },
+          },
+        },
+        { $sort: { count: -1 } },
+        {
+          $project: {
+            _id: 0,
+            location: 1,
+            count: 1,
+            links: 1,
           },
         },
       ]);

@@ -63,4 +63,13 @@ export class ScraperStatsService {
       throw error;
     }
   }
+
+  async getHeatMap() {
+    try {
+      return await this.persistenceService.getHeatMap();
+    } catch (error) {
+      this.logger.error("Error al obtener estadísticas", error);
+      throw error;
+    }
+  }
 }

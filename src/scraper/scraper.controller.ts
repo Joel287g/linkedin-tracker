@@ -28,4 +28,9 @@ export class ScraperController {
   async ghosting() {
     return await this.statsService.getGhosting()
   }
+
+  @Get("heat-map")
+  async getHeatMap() {
+    return await this.statsService.getHeatMap();
+  }
 }
