@@ -8,6 +8,7 @@ import {
   ScraperJobDetailsService,
   ScraperListPageService,
   ScraperPersistenceService,
+  ScraperStatsService,
 } from "./services";
 
 //? Imports de Controladores
@@ -32,6 +33,7 @@ import {
     ScraperListPageService,
     ScraperJobDetailsService,
     ScraperPersistenceService,
+    ScraperStatsService,
   ],
   controllers: [
     //* Entry point para los comandos de sincronización

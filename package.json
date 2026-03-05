@@ -30,6 +30,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/mongoose": "^11.0.4",
     "@nestjs/platform-express": "^11.0.1",
+    "asciichart": "^1.5.25",
     "mongoose": "^8.10.1",
     "playwright": "^1.50.1",
     "reflect-metadata": "^0.2.2",

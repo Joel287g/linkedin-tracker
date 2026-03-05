@@ -1,5 +1,5 @@
 //? Imports de NestJS y Mongoose
-import { Model, Types } from "mongoose";
+import { Model } from "mongoose";
 
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
@@ -91,6 +91,65 @@ export class ScraperPersistenceService {
     } catch (error) {
       this.logger.error(`❌ Error al obtener jobIds: ${error.message}`);
       return [];
+    }
+  }
+
+  /**
+   * ** Genera un gráfico de evolución de estados de las aplicaciones.
+   * @description Método auxiliar para visualizar la evolución de los estados de las aplicaciones a lo largo del tiempo. Utiliza la biblioteca asciichart para generar un gráfico en la consola.
+   * @returns Promise<string[]>
+   */
+  async getStatus() {
+    try {
+      return await this.applicationModel.aggregate([
+        {
+          $group: {
+            _id: "$status",
+            total: {
+              $sum: 1,
+            },
+            links: {
+              $push: "$link",
+            },
+            allRecruiters: {
+              $push: "$recruiter.profileLink",
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            total: 1,
+            links: 1,
+            recruiters: {
+              $filter: {
+                input: "$allRecruiters",
+                as: "res",
+                cond: {
+                  $and: [
+                    {
+                      $ne: ["$$res", "Enlace no disponible"],
+                    },
+                    {
+                      $ne: ["$$res", null],
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+        {
+          $sort: {
+            total: -1,
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(
+        `❌ Error al generar gráfico de evolución: ${error.message}`,
+      );
+      return;
     }
   }
 }
